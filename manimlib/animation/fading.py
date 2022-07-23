@@ -72,6 +72,14 @@ class FadeOutToPoint(FadeOut):
             **kwargs,
         )
 
+class FadeInFrom(FadeIn):#lcj添加
+	def __init__(self, mobject, dir, **kwargs):
+		super().__init__(
+			mobject,
+			shift=-dir/2,
+			scale=1,
+			**kwargs,
+		)
 
 class FadeTransform(Transform):
     CONFIG = {
