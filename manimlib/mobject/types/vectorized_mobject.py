@@ -189,7 +189,14 @@ class VMobject(Mobject):
         }
 
     def match_style(self, vmobject, recurse=True):
-        self.set_style(**vmobject.get_style(), recurse=False)
+		# make copies for np.ndarrays
+		# to avoid reference issues
+        target_style=vmobject.get_style()
+        for key in target_style:
+            if isinstance(target_style[key],np.ndarray):
+                target_style[key]=target_style[key].copy()
+        self.set_style(**target_style, recurse=False)
+
         if recurse:
             # Does its best to match up submobject lists, and
             # match styles accordingly
