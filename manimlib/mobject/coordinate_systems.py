@@ -32,7 +32,7 @@ class CoordinateSystem():
         "num_sampled_graph_points_per_tick": 5,
     }
 
-    def coords_to_point(self, *coords):
+    def coords_to_point(self, *coords) -> np.ndarray:
         raise Exception("Not implemented")
 
     def point_to_coords(self, point):
@@ -49,10 +49,13 @@ class CoordinateSystem():
     def get_origin(self):
         return self.c2p(*[0] * self.dimension)
 
-    def get_axes(self):
+    # the return type is intentionally set here
+	# so pylance won't take Exception and 
+	# recgnize subsequent code as "unreachable".
+    def get_axes(self) -> object:
         raise Exception("Not implemented")
 
-    def get_all_ranges(self):
+    def get_all_ranges(self) -> object:
         raise Exception("Not implemented")
 
     def get_axis(self, index):
@@ -305,6 +308,7 @@ class Axes(VGroup, CoordinateSystem):
     def create_axis(self, range_terms, axis_config, length):
         new_config = merge_dicts_recursively(self.axis_config, axis_config)
         new_config["width"] = length
+        #print(range_terms,'\n', new_config)
         axis = NumberLine(range_terms, **new_config)
         axis.shift(-axis.n2p(0))
         return axis
