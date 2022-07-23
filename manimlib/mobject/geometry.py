@@ -411,6 +411,13 @@ class Line(TipableVMobject):
             self.set_points_as_corners([start, end])
         self.account_for_buff(self.buff)
 
+    # setter that set the start and end point of an arrow
+	# after initial object construction
+    def set_start_and_end(self, start, end):
+        self.set_start_and_end_attrs(start,end)
+        self.set_points_by_ends(self.start, self.end, self.buff, self.path_arc)
+        return self
+
     def set_path_arc(self, new_value):
         self.path_arc = new_value
         self.init_points()
