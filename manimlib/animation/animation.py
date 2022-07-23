@@ -27,6 +27,7 @@ class Animation(object):
         # with lagged start times
         "lag_ratio": DEFAULT_ANIMATION_LAG_RATIO,
         "suspend_mobject_updating": True,
+        "clip_alpha": True,
     }
 
     def __init__(self, mobject, **kwargs):
@@ -110,7 +111,7 @@ class Animation(object):
 
     # Methods for interpolation, the mean of an Animation
     def interpolate(self, alpha):
-        alpha = clip(alpha, 0, 1)
+        if self.clip_alpha: alpha = clip(alpha, 0, 1)
         self.interpolate_mobject(self.rate_func(alpha))
 
     def update(self, alpha):
@@ -137,7 +138,8 @@ class Animation(object):
         full_length = (num_submobjects - 1) * lag_ratio + 1
         value = alpha * full_length
         lower = index * lag_ratio
-        return clip((value - lower), 0, 1)
+        if self.clip_alpha: return clip((value - lower), 0, 1)
+        else: return value-lower
 
     # Getters and setters
     def set_run_time(self, run_time):
