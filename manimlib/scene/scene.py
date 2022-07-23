@@ -15,6 +15,7 @@ from manimlib.mobject.mobject import Point
 from manimlib.camera.camera import Camera
 from manimlib.constants import DEFAULT_WAIT_TIME
 from manimlib.mobject.mobject import Mobject
+from manimlib.animation.animation import Animation
 from manimlib.scene.scene_file_writer import SceneFileWriter
 from manimlib.utils.config_ops import digest_config
 from manimlib.utils.family_ops import extract_mobject_family_members
@@ -348,24 +349,31 @@ class Scene(object):
             state["method_args"] = []
 
         for arg in args:
+            # a Mobject.method means a new animation.
+            # and marks the end of the previous animation(if there're any).
             if inspect.ismethod(arg):
                 compile_method(state)
                 state["curr_method"] = arg
+            # an Animation object also means a new animation.
+            elif isinstance(arg, Animation): 
+                try:
+                    anim = prepare_animation(arg)
+                except TypeError:
+                    raise TypeError(f"Unexpected argument {arg} passed to Scene.play()")
+                compile_method(state)
+                animations.append(anim)
+            # animation arguments
             elif state["curr_method"] is not None:
                 state["method_args"].append(arg)
+            # error proning
             elif isinstance(arg, Mobject):
                 raise Exception("""
                     I think you may have invoked a method
                     you meant to pass in as a Scene.play argument
                 """)
             else:
-                try:
-                    anim = prepare_animation(arg)
-                except TypeError:
-                    raise TypeError(f"Unexpected argument {arg} passed to Scene.play()")
-
-                compile_method(state)
-                animations.append(anim)
+                raise ValueError("Unknown args passed to Scene.play.")
+                
         compile_method(state)
 
         for animation in animations:
