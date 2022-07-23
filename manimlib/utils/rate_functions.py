@@ -51,6 +51,8 @@ def there_and_back_with_pause(t, pause_ratio=1. / 3):
 def running_start(t, pull_factor=-0.5):
     return bezier([0, 0, pull_factor, pull_factor, 1, 1, 1])(t)
 
+def braking_end(t):
+	return 1-running_start(1-t)
 
 def not_quite_there(func=smooth, proportion=0.7):
     def result(t):
