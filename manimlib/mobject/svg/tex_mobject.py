@@ -156,10 +156,10 @@ class Tex(SingleStringTex):
     CONFIG = {
         "arg_separator": "",
         "isolate": [],
-		# recognize isolate strings as regex patterns.
-		# useful when you have formula token overlappings
-		# e.g. You want to isolate 'i', but there're both 
-		# 'i's and '\sin's in the formula tex.
+        # recognize isolate strings as regex patterns.
+        # useful when you have formula token overlappings
+        # e.g. You want to isolate 'i', but there're both 
+        # 'i's and '\sin's in the formula tex.
         "isolate_use_regex": False, 
         "tex_to_color_map": {},
     }
