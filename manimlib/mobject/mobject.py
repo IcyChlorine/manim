@@ -287,6 +287,27 @@ class Mobject(object):
                 mobject.parents.remove(self)
         self.assemble_family()
         return self
+        
+    def clear(self):#lcj加
+        self.remove(*self.submobjects)
+        return self
+
+    def clear_except(self, *mobjects_to_exclude):
+        for m in self.submobjects:
+            if m in mobjects_to_exclude: continue
+            #else
+            self.remove(m)
+        return self
+
+    def remove_redundant_submobjects(self):
+        #lcj加 将所有add_n_more_submobjects中人为添加的submobjects移除
+        #TODO: 未完全成功。在Animation前后还有各种情况需要考虑。
+        submobj_new=[]
+        for m in self.submobjects:
+            if hasattr(m,'is_redundant') and m.is_redundant:
+                continue
+            submobj_new.append(m)
+        self.set_submobjects(submobj_new)
 
     def add_to_back(self, *mobjects):
         self.set_submobjects(list_update(mobjects, self.submobjects))
@@ -935,7 +956,7 @@ class Mobject(object):
 
     def fade(self, darkness=0.5, recurse=True):
         self.set_opacity(1.0 - darkness, recurse=recurse)
-
+    
     def get_gloss(self):
         return self.uniforms["gloss"]
 
@@ -1230,6 +1251,7 @@ class Mobject(object):
             new_submobs.append(submob)
             for k in range(1, sf):
                 new_submob = submob.copy()
+                #new_submob.is_redundant = True #lcj加，为了以后可以移除这些额外的mobject
                 # If the submobject is at all transparent, then
                 # make the copy completely transparent
                 if submob.get_opacity() < 1:

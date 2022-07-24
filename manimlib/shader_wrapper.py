@@ -100,6 +100,7 @@ class ShaderWrapper(object):
             if code_map[name] is None:
                 continue
             code_map[name] = re.sub(old, new, code_map[name])
+            #print(code_map[name])
         self.refresh_id()
 
     def combine_with(self, *shader_wrappers):

@@ -223,13 +223,14 @@ class VMobject(Mobject):
         factor = 1.0 - darkness
         self.set_fill(
             opacity=factor * self.get_fill_opacity(),
-            recurse=False,
+            recurse=recurse,
         )
         self.set_stroke(
             opacity=factor * self.get_stroke_opacity(),
-            recurse=False,
+            recurse=recurse,
         )
-        super().fade(darkness, recurse)
+		#lcj改. super().fade应该是undesired functionality才对.
+        #super().fade(darkness, recurse)
         return self
 
     def get_fill_colors(self):
@@ -997,6 +998,42 @@ class VGroup(VMobject):
             raise Exception("All submobjects must be of type VMobject")
         super().__init__(**kwargs)
         self.add(*vmobjects)
+
+    def align_on_first(self,direction):
+        for i in range(1,len(self)):
+            self[i].align_to(self[0],direction)
+        return self
+
+    def align_on_equiv(self,idx_to_align=0):#在等号处左右对齐，模仿latex中的align环境
+        from manimlib.mobject.svg.tex_mobject import Tex
+        #lcj: 不得不在函数里import，否则tex_mobject.py 和vectorized_mobject.py之间会形成循环引用，并报错
+
+        tex_str=[]
+        for i,line in enumerate(self):
+            assert(isinstance(line,Tex))
+
+            tex_str.append([part.tex_string for part in line])
+            if '=' not in tex_str[-1]:
+                print("There's no `=` in the formula, can't be aligned by equiv sign!")
+
+        line_to_align=self[idx_to_align]    
+        equiv_idx_on_align=tex_str[idx_to_align].index('=')
+            
+        for i,line in enumerate(self):
+            if i==idx_to_align: continue
+            print(tex_str[i])
+            equiv_idx=tex_str[i].index('=')
+            print(equiv_idx)
+
+            #delta=
+            line.shift(LEFT*(
+                line[equiv_idx].get_left()-
+                line_to_align[equiv_idx_on_align].get_left()
+            ))
+        return self
+            
+            
+            
 
 
 class VectorizedPoint(Point, VMobject):

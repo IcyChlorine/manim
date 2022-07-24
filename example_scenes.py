@@ -70,7 +70,7 @@ class OpeningManimExample(Scene):
 
 class AnimatingMethods(Scene):
     def construct(self):
-        grid = Tex(r"\pi").get_grid(10, 10, height=4)
+        grid = Tex(r"|\Delta\rangle").get_grid(10, 10, height=4)
         self.add(grid)
 
         # You can animate the application of mobject methods with the
@@ -158,6 +158,9 @@ class TextExample(Scene):
 
 
 class TexTransformExample(Scene):
+    def wait(self,*args,**kwargs):
+        import os
+        os.system("pause")
     def construct(self):
         to_isolate = ["B", "C", "=", "(", ")"]
         lines = VGroup(
@@ -249,8 +252,9 @@ class TexTransformExample(Scene):
             **play_kw
         )
         self.wait(3)
+        self.embed()
         self.play(FadeOut(lines, RIGHT))
-
+        
         # Alternatively, if you don't want to think about breaking up
         # the tex strings deliberately, you can TransformMatchingShapes,
         # which will try to line up all pieces of a source mobject with
