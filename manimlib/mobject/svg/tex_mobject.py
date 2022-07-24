@@ -156,9 +156,12 @@ class Tex(SingleStringTex):
     CONFIG = {
         "arg_separator": "",
         "isolate": [],
+		# recognize isolate strings as regex patterns.
+		# useful when you have formula token overlappings
+		# e.g. You want to isolate 'i', but there're both 
+		# 'i's and '\sin's in the formula tex.
+        "isolate_use_regex": False, 
         "tex_to_color_map": {},
-        "t2c": {}, #lcj改,alias
-        "use_reg": False #lcj加，用于在传入isolate的时候传入正则表达式
     }
 
     def __init__(self, *tex_strings, **kwargs):
