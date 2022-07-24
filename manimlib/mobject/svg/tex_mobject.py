@@ -61,7 +61,10 @@ class SingleStringTex(VMobject):
             self.organize_submobjects_left_to_right()
 
     def get_tex_file_body(self, tex_string):
+        #print('original tex string is: '+tex_string) #debug pring
         new_tex = self.get_modified_expression(tex_string)
+        #print('modified tex string is: '+new_tex)
+        #print('')
         if self.math_mode:
             new_tex = "\\begin{align*}\n" + new_tex + "\n\\end{align*}"
 
@@ -154,14 +157,22 @@ class Tex(SingleStringTex):
         "arg_separator": "",
         "isolate": [],
         "tex_to_color_map": {},
+        "t2c": {}, #lcj改,alias
+        "use_reg": False #lcj加，用于在传入isolate的时候传入正则表达式
     }
 
     def __init__(self, *tex_strings, **kwargs):
         digest_config(self, kwargs)
+        if self.tex_to_color_map and self.t2c:#handle alias
+            raise ValueError("You can't set two tex to color map!")
+        if not self.tex_to_color_map:
+            self.tex_to_color_map=self.t2c
+
         self.tex_strings = self.break_up_tex_strings(tex_strings)
         full_string = self.arg_separator.join(self.tex_strings)
         super().__init__(full_string, **kwargs)
         self.break_up_by_substrings()
+
         self.set_color_by_tex_to_color_map(self.tex_to_color_map)
 
         if self.organize_left_to_right:
@@ -174,10 +185,11 @@ class Tex(SingleStringTex):
         if len(substrings_to_isolate) == 0:
             return tex_strings
         patterns = (
-            "({})".format(re.escape(ss))
+            "({})".format(ss if self.use_reg else re.escape(ss))
             for ss in substrings_to_isolate
         )
         pattern = "|".join(patterns)
+        #print(pattern)
         pieces = []
         for s in tex_strings:
             if pattern:
@@ -242,6 +254,9 @@ class Tex(SingleStringTex):
         for tex, color in list(tex_to_color_map.items()):
             self.set_color_by_tex(tex, color, **kwargs)
         return self
+
+    def set_t2c(self, tex_to_color_map, **kwargs):#alias
+        return self.set_color_by_tex_to_color_map(tex_to_color_map,**kwargs)
 
     def index_of_part(self, part, start=0):
         return self.submobjects.index(part, start)
