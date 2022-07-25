@@ -4,6 +4,7 @@ import platform
 import itertools as it
 import logging
 from functools import wraps
+from typing import Iterable
 
 from tqdm import tqdm as ProgressDisplay
 import numpy as np
@@ -202,14 +203,14 @@ class Scene(object):
     def get_mobject_family_members(self):
         return extract_mobject_family_members(self.mobjects)
 
-    def add(self, *new_mobjects):
+    def add(self, *new_mobjects: Mobject) -> Iterable[Mobject]: 
         """
         Mobjects will be displayed, from background to
         foreground in the order with which they are added.
         """
         self.remove(*new_mobjects)
         self.mobjects += new_mobjects
-        return self
+        return new_mobjects
 
     def add_mobjects_among(self, values):
         """
