@@ -287,6 +287,10 @@ class Mobject(object):
                 mobject.parents.remove(self)
         self.assemble_family()
         return self
+    
+    def clear(self):
+        self.remove(*self.submobjects)
+        return self
 
     def add_to_back(self, *mobjects):
         self.set_submobjects(list_update(mobjects, self.submobjects))

@@ -166,9 +166,10 @@ class Tex(SingleStringTex):
 
     def __init__(self, *tex_strings, **kwargs):
         digest_config(self, kwargs)
-        if self.tex_to_color_map and self.t2c:#handle alias
+		#handle alias
+        if self.tex_to_color_map and hasattr(self,'t2c'):
             raise ValueError("You can't set two tex to color map!")
-        if not self.tex_to_color_map:
+        if not self.tex_to_color_map and hasattr(self,'t2c'):
             self.tex_to_color_map=self.t2c
 
         self.tex_strings = self.break_up_tex_strings(tex_strings)
