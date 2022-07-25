@@ -1,8 +1,12 @@
 #!/usr/bin/env python
+try:
+    import pretty_errors
+except ModuleNotFoundError:
+    print('Package pretty_errors not found. Printing plain error messages instead.')
+    print('Use `pip install pretty_errors` to get better error messages.')
 import manimlib.config
 import manimlib.extract_scene
 import manimlib.utils.init_config
-
 
 def main():
     args = manimlib.config.parse_cli()
