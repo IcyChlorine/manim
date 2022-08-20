@@ -402,6 +402,11 @@ class Scene(object):
         self.mobjects = []
         return self
 
+    def pop(self):
+        if len(self.mobjects)>0: 
+            self.remove(self.mobjects[-1])
+        return self
+
     def get_mobjects(self) -> list[Mobject]:
         return list(self.mobjects)
 
