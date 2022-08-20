@@ -332,7 +332,7 @@ class Scene(object):
     def get_mobject_family_members(self) -> list[Mobject]:
         return extract_mobject_family_members(self.mobjects)
 
-    def add(self, *new_mobjects: Mobject):
+    def add(self, *new_mobjects: Mobject) -> Mobject | Iterable[Mobject]:
         """
         Mobjects will be displayed, from background to
         foreground in the order with which they are added.
@@ -344,7 +344,11 @@ class Scene(object):
             for m in new_mobjects
             for sm in m.get_family()
         })
-        return self
+
+        # Return the mobjects being added.
+        # so handy that I add it here. (starsky)
+        if len(new_mobjects)==1: return new_mobjects[0]
+        else: return new_mobjects
 
     def add_mobjects_among(self, values: Iterable):
         """
