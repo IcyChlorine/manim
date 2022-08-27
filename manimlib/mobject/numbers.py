@@ -3,6 +3,7 @@ from __future__ import annotations
 import numpy as np
 
 from manimlib.constants import DOWN, LEFT, RIGHT, UP
+from manimlib.utils.bezier import interpolate
 from manimlib.mobject.svg.tex_mobject import SingleStringTex
 from manimlib.mobject.svg.text_mobject import Text
 from manimlib.mobject.types.vectorized_mobject import VMobject
@@ -154,6 +155,11 @@ class DecimalNumber(VMobject):
     def increment_value(self, delta_t: float | complex = 1) -> None:
         self.set_value(self.get_value() + delta_t)
 
+    def interpolate(self, m1: VMobject, m2: VMobject, alpha: float, *args, **kwargs):
+        if isinstance(m1, DecimalNumber) and isinstance(m2, DecimalNumber):
+            return self.set_value(interpolate(m1.get_value(),m2.get_value(),alpha))
+        else:
+            return super().interpolate(m1, m2, alpha, *args, **kwargs)
 
 class Integer(DecimalNumber):
     CONFIG = {
