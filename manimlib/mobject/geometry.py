@@ -495,7 +495,7 @@ class Line(TipableVMobject):
         return self
 
     # setter that set the start and end point of an arrow
-	# after initial object construction
+    # after initial object construction
     def set_start_and_end(self, start, end):
         self.set_start_and_end_attrs(start,end)
         self.set_points_by_ends(self.start, self.end, self.buff, self.path_arc)
@@ -598,6 +598,33 @@ class DashedLine(Line):
         )
         self.clear_points()
         self.add(*dashes)
+
+    def set_start_and_end(self, start, end):
+        # This is totally reinit everything 
+        # Thanks to the code by Grant, which is immutable and un-orthoganal
+        self.clear()
+
+        super().set_start_and_end(start, end)
+
+        ps_ratio = self.positive_space_ratio
+
+        # quick and dirty hack to avoid exception
+        try:
+            full_length = self.dash_length / ps_ratio
+            num_dashes = int(np.ceil(get_norm(end-start)/ full_length))
+        except ZeroDivisionError:
+            num_dashes
+
+        
+        dashes = DashedVMobject(
+            self,
+            num_dashes=num_dashes,
+            positive_space_ratio=ps_ratio
+        )
+        self.clear_points()
+        self.add(*dashes)
+        return self
+        
 
     def calculate_num_dashes(self, positive_space_ratio: float) -> int:
         try:
