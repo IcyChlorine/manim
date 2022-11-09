@@ -129,6 +129,23 @@ class ShaderWrapper(object):
             code_map[name] = re.sub(old, new, code_map[name])
         self.refresh_id()
 
+    def set_code(self, shader: str, code: str) -> None:
+        valid_shader = False
+        if shader in ['vert', 'vertex', 'vert_shader', 'vertex_shader']:
+            shader = 'vertex_shader'
+            valid_shader = True
+        elif shader in ['geom', 'geometry', 'geom_shader', 'geometry_shader']:
+            shader = 'geometry_shader'
+            valid_shader = True
+        elif shader in ['frag', 'fragment', 'frag_shader', 'fragment_shader']:
+            shader = 'fragment_shader'
+            valid_shader = True
+        if not valid_shader:
+            raise ValueError("Invalid shader name!")
+
+        self.program_code[shader] = code
+        self.refresh_id()
+
     def combine_with(self, *shader_wrappers: ShaderWrapper):
         # Assume they are of the same type
         if len(shader_wrappers) == 0:
