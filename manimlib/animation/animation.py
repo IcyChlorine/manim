@@ -38,7 +38,19 @@ class Animation(object):
         # with lagged start times
         "lag_ratio": DEFAULT_ANIMATION_LAG_RATIO,
         "suspend_mobject_updating": True,
+
+        # Whether clip alpha into [0,1].
+		# If not, it's possible to use alpha<0 or alpha>1
+		# via rate_func to make anticipation and recovery
+		# effects.
         "clip_alpha": True,
+        # When animating mobjects with with subnodes(have family)
+		# Whether interpolate each submobject parallely
+		# (done by animation) or interpolate the mobject recursively.
+		# The latter manner enables father mobject to control how
+		# its submobjects are interpolated.
+		# NOT compatible with all animation types.
+        "recursive": False
     }
 
     def __init__(self, mobject: Mobject, **kwargs):
@@ -96,8 +108,16 @@ class Animation(object):
         return self.mobject, self.starting_mobject
 
     def get_all_families_zipped(self) -> zip[tuple[Mobject]]:
+        # IcyChlorine: This is not the most semantically correct
+		# place to implement self.recursive (as the returned value
+		# will become self.families, but then we will not have 
+		# 'self.families' being the entire families), but the most
+		# suitable function to implement. Minimized code modification
+		# is needed by modifying this function. 
+		# Maybe 'self.families' should be better called
+		# 'self.all_submobjs' instead.
         return zip(*[
-            mob.get_family()
+            ([mob] if self.recursive else mob.get_family())
             for mob in self.get_all_mobjects()
         ])
 

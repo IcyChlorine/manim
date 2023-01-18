@@ -113,7 +113,7 @@ class Transform(Animation):
 
     def get_all_families_zipped(self) -> zip[tuple[Mobject]]:
         return zip(*[
-            mob.get_family()
+            ([mob] if self.recursive else mob.get_family())
             for mob in [
                 self.mobject,
                 self.starting_mobject,
@@ -128,7 +128,10 @@ class Transform(Animation):
         target_copy: Mobject,
         alpha: float
     ):
-        submob.interpolate(start, target_copy, alpha, self.path_func)
+        if self.recursive:
+            submob.interpolate(start, target_copy, alpha, self.path_func, recursive=self.recursive)
+        else:
+            submob.interpolate(start, target_copy, alpha, self.path_func)
         return self
 
 
