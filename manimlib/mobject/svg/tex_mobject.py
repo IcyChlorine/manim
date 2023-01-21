@@ -221,7 +221,7 @@ class Tex(SingleStringTex):
         if len(substrings_to_isolate) == 0:
             return tex_strings
         patterns = (
-            "({})".format(ss if self.use_reg else re.escape(ss))
+            "({})".format(ss if self.isolate_use_regex else re.escape(ss))
             for ss in substrings_to_isolate
         )
         pattern = "|".join(patterns)
