@@ -789,9 +789,14 @@ class Mobject(object):
     def is_changing(self) -> bool:
         return self._is_animating or self.has_updaters
 
-    def set_animating_status(self, is_animating: bool, recurse: bool = True) -> None:
-        for mob in self.get_family(recurse):
+    def set_animating_status(self, is_animating: bool, 
+                             recurse_down: bool = True,
+                             recurse_up: bool = True) -> None:
+        for mob in self.get_family(recurse_down):
             mob._is_animating = is_animating
+        if recurse_up: 
+            for parent in self.parents:
+                parent.set_animating_status(is_animating, recurse_down=False, recurse_up=True)
         return self
 
     # Transforming operations
