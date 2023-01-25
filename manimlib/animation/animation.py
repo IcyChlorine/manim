@@ -117,7 +117,7 @@ class Animation(object):
 		# Maybe 'self.families' should be better called
 		# 'self.all_submobjs' instead.
         return zip(*[
-            ([mob] if self.recursive else mob.get_family())
+            mob.get_family(not self.recursive)
             for mob in self.get_all_mobjects()
         ])
 

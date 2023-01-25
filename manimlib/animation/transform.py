@@ -113,7 +113,7 @@ class Transform(Animation):
 
     def get_all_families_zipped(self) -> zip[tuple[Mobject]]:
         return zip(*[
-            ([mob] if self.recursive else mob.get_family())
+            mob.get_family(not self.recursive)
             for mob in [
                 self.mobject,
                 self.starting_mobject,
