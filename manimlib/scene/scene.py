@@ -93,7 +93,7 @@ class Scene(object):
 
         if self.start_at_animation_number is not None:
             self.skip_animations = True
-        if self.file_writer.has_progress_display:
+        if self.file_writer.has_progress_display():
             self.show_animation_progress = False
 
         # Items associated with interaction
@@ -481,8 +481,7 @@ class Scene(object):
 
         times = np.arange(0, run_time, 1 / self.camera.fps)
 
-        if self.file_writer.has_progress_display:
-            self.file_writer.set_progress_display_subdescription(desc)
+        self.file_writer.set_progress_display_description(sub_desc=desc)
 
         if self.show_animation_progress:
             return ProgressDisplay(

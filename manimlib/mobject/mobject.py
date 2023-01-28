@@ -524,6 +524,11 @@ class Mobject(object):
         self.assemble_family()
         return self
 
+    def reverse_submobjects(self):
+        self.submobjects.reverse()
+        self.assemble_family()
+        return self
+
     # Copying and serialization
 
     def stash_mobject_pointers(func):
@@ -631,7 +636,7 @@ class Mobject(object):
             mobject = pickle.load(fp)
         return mobject
 
-    def become(self, mobject: Mobject):
+    def become(self, mobject: Mobject, match_updaters=False):
         """
         Edit all data and submobjects to be idential
         to another mobject
@@ -651,7 +656,8 @@ class Mobject(object):
             if isinstance(value, Mobject) and value in family2:
                 setattr(self, attr, family1[family2.index(value)])
         self.refresh_bounding_box(recurse_down=True)
-        self.match_updaters(mobject)
+        if match_updaters:
+            self.match_updaters(mobject)
         return self
 
     def looks_identical(self, mobject: Mobject):
@@ -679,16 +685,35 @@ class Mobject(object):
         group_class = self.get_group_class()
         return group_class(*(self.copy() for _ in range(n)))
 
-    def get_grid(self, n_rows: int, n_cols: int, height: float | None = None, **kwargs) -> Group:
+    def get_grid(self,
+                 n_rows: int,
+                 n_cols: int,
+                 height: float | None = None,
+                 width: float | None = None,
+                 group_by_rows: bool = False,
+                 group_by_cols: bool = False,
+                 **kwargs) -> Group:
         """
         Returns a new mobject containing multiple copies of this one
         arranged in a grid
         """
-        grid = self.replicate(n_rows * n_cols)
+        total = n_rows * n_cols
+        grid = self.replicate(total)
+        if group_by_cols:
+            kwargs["fill_rows_first"] = False
         grid.arrange_in_grid(n_rows, n_cols, **kwargs)
         if height is not None:
             grid.set_height(height)
-        return grid
+        if width is not None:
+            grid.set_height(width)
+
+        group_class = self.get_group_class()
+        if group_by_rows:
+            return group_class(*(grid[n:n + n_cols] for n in range(0, total, n_cols)))
+        elif group_by_cols:
+            return group_class(*(grid[n:n + n_rows] for n in range(0, total, n_rows)))
+        else:
+            return grid
 
     # Updating
 
@@ -794,14 +819,9 @@ class Mobject(object):
     def is_changing(self) -> bool:
         return self._is_animating or self.has_updaters
 
-    def set_animating_status(self, is_animating: bool, 
-                             recurse_down: bool = True,
-                             recurse_up: bool = True) -> None:
-        for mob in self.get_family(recurse_down):
+    def set_animating_status(self, is_animating: bool, recurse: bool = True) -> None:
+        for mob in (*self.get_family(recurse), *self.get_ancestors(extended=True)):
             mob._is_animating = is_animating
-        if recurse_up: 
-            for parent in self.parents:
-                parent.set_animating_status(is_animating, recurse_down=False, recurse_up=True)
         return self
 
     # Transforming operations
@@ -1274,7 +1294,10 @@ class Mobject(object):
         return self.data["rgbas"][0, 3]
 
     def set_color_by_gradient(self, *colors: ManimColor):
-        self.set_submobject_colors_by_gradient(*colors)
+        if self.has_points():
+            self.set_color(colors)
+        else:
+            self.set_submobject_colors_by_gradient(*colors)
         return self
 
     def set_submobject_colors_by_gradient(self, *colors: ManimColor):
