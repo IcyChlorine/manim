@@ -190,7 +190,6 @@ class Mobject(object):
         for mob in self.get_family():
             for key in mob.data:
                 mob.data[key] = mob.data[key][::-1]
-        self.refresh_unit_normal()
         return self
 
     def apply_points_function(
@@ -638,13 +637,19 @@ class Mobject(object):
         to another mobject
         """
         self.align_family(mobject)
-        for sm1, sm2 in zip(self.get_family(), mobject.get_family()):
+        family1 = self.get_family()
+        family2 = mobject.get_family()
+        for sm1, sm2 in zip(family1, family2):
             sm1.set_data(sm2.data)
             sm1.set_uniforms(sm2.uniforms)
             sm1.shader_folder = sm2.shader_folder
             sm1.texture_paths = sm2.texture_paths
             sm1.depth_test = sm2.depth_test
             sm1.render_primitive = sm2.render_primitive
+        # Make sure named family members carry over
+        for attr, value in list(mobject.__dict__.items()):
+            if isinstance(value, Mobject) and value in family2:
+                setattr(self, attr, family1[family2.index(value)])
         self.refresh_bounding_box(recurse_down=True)
         self.match_updaters(mobject)
         return self
@@ -1453,7 +1458,7 @@ class Mobject(object):
         return interpolate(points[i], points[i + 1], subalpha)
 
     def pfp(self, alpha):
-        """Abbreviation fo point_from_proportion"""
+        """Abbreviation for point_from_proportion"""
         return self.point_from_proportion(alpha)
 
     def get_pieces(self, n_pieces: int) -> Group:
@@ -2024,7 +2029,9 @@ class _AnimationBuilder:
         self.overridden_animation = None
         self.mobject.generate_target()
         self.is_chaining = False
-        self.methods = []
+        self.methods: list[Callable] = []
+        self.anim_args = {}
+        self.can_pass_args = True
 
     def __getattr__(self, method_name: str):
         method = getattr(self.mobject.target, method_name)
@@ -2049,13 +2056,40 @@ class _AnimationBuilder:
         self.is_chaining = True
         return update_target
 
+    def __call__(self, **kwargs):
+        return self.set_anim_args(**kwargs)
+
+    def set_anim_args(self, **kwargs):
+        '''
+        You can change the args of :class:`~manimlib.animation.transform.Transform`, such as
+
+        - ``run_time``
+        - ``time_span``
+        - ``rate_func``
+        - ``lag_ratio``
+        - ``path_arc``
+        - ``path_func``
+
+        and so on.
+        '''
+
+        if not self.can_pass_args:
+            raise ValueError(
+                "Animation arguments can only be passed by calling ``animate`` "
+                "or ``set_anim_args`` and can only be passed once",
+            )
+
+        self.anim_args = kwargs
+        self.can_pass_args = False
+        return self
+
     def build(self):
         from manimlib.animation.transform import _MethodAnimation
 
         if self.overridden_animation:
             return self.overridden_animation
 
-        return _MethodAnimation(self.mobject, self.methods)
+        return _MethodAnimation(self.mobject, self.methods, **self.anim_args)
 
 
 def override_animate(method):

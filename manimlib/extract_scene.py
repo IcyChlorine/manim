@@ -120,6 +120,9 @@ def get_scenes_to_render(scene_classes, scene_config, config):
 
     # another case
     result=[]
+    
+    # another case
+    result=[]
     if len(scene_classes) == 1:
         scene_classes = [scene_classes[0]]
     else:
