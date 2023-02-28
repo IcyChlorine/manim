@@ -4,7 +4,6 @@ from copy import deepcopy
 
 from manimlib.mobject.mobject import _AnimationBuilder
 from manimlib.mobject.mobject import Mobject
-from manimlib.utils.config_ops import digest_config
 from manimlib.utils.rate_functions import smooth
 from manimlib.utils.rate_functions import squish_rate_func
 from manimlib.utils.simple_functions import clip
@@ -22,46 +21,46 @@ DEFAULT_ANIMATION_LAG_RATIO = 0
 
 
 class Animation(object):
-    CONFIG = {
-        "run_time": DEFAULT_ANIMATION_RUN_TIME,
-        "time_span": None,  # Tuple of times, between which the animation will run
-        "rate_func": smooth,
-        "name": None,
-        # Does this animation add or remove a mobject form the screen
-        "remover": False,
-        # What to enter into the update function upon completion
-        "final_alpha_value": 1,
-        # If 0, the animation is applied to all submobjects
-        # at the same time
+    def __init__(
+        self,
+        mobject: Mobject,
+        run_time: float = DEFAULT_ANIMATION_RUN_TIME,
+        # Tuple of times, between which the animation will run
+        time_span: tuple[float, float] | None = None,
+        # If 0, the animation is applied to all submobjects at the same time
         # If 1, it is applied to each successively.
-        # If 0 < lag_ratio < 1, its applied to each
-        # with lagged start times
-        "lag_ratio": DEFAULT_ANIMATION_LAG_RATIO,
-        "suspend_mobject_updating": True,
-
-        # Whether clip alpha into [0,1].
-		# If not, it's possible to use alpha<0 or alpha>1
-		# via rate_func to make anticipation and recovery
-		# effects.
-        "clip_alpha": True,
+        # If 0 < lag_ratio < 1, its applied to each with lagged start times
+        lag_ratio: float = DEFAULT_ANIMATION_LAG_RATIO,
+        rate_func: Callable[[float], float] = smooth,
+        name: str = "",
+        # Does this animation add or remove a mobject form the screen
+        remover: bool = False,
         # When animating mobjects with with subnodes(have family)
 		# Whether interpolate each submobject parallely
 		# (done by animation) or interpolate the mobject recursively.
 		# The latter manner enables father mobject to control how
 		# its submobjects are interpolated.
 		# NOT compatible with all animation types.
-        "recursive": False
-    }
-
-    def __init__(self, mobject: Mobject, **kwargs):
-        assert(isinstance(mobject, Mobject))
-        digest_config(self, kwargs)
+        recursive = False,
+		# What to enter into the update function upon completion
+        final_alpha_value: float = 1.0,
+        suspend_mobject_updating: bool = True,
+    ):
         self.mobject = mobject
+        self.run_time = run_time
+        self.time_span = time_span
+        self.rate_func = rate_func
+        self.name = name or self.__class__.__name__ + str(self.mobject)
+        self.remover = remover
+        self.final_alpha_value = final_alpha_value
+        self.recursive = recursive
+        self.lag_ratio = lag_ratio
+        self.suspend_mobject_updating = suspend_mobject_updating
+
+        assert(isinstance(mobject, Mobject))
 
     def __str__(self) -> str:
-        if self.name:
-            return self.name
-        return self.__class__.__name__ + str(self.mobject)
+        return self.name
 
     def begin(self) -> None:
         # This is called right as an animation is being
@@ -144,8 +143,15 @@ class Animation(object):
     def copy(self):
         return deepcopy(self)
 
-    def update_config(self, **kwargs):
-        digest_config(self, kwargs)
+    def update_rate_info(
+        self,
+        run_time: float | None = None,
+        rate_func: Callable[[float], float] | None = None,
+        lag_ratio: float | None = None,
+    ):
+        self.run_time = run_time or self.run_time
+        self.rate_func = rate_func or self.rate_func
+        self.lag_ratio = lag_ratio or self.lag_ratio
         return self
 
     # Methods for interpolation, the mean of an Animation
