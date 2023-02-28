@@ -9,8 +9,8 @@
       <link rel="stylesheet" href="../_static/copybutton.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/manim-kindergarten/CDN@master/manimgl_assets/custom.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/manim-kindergarten/CDN@master/manimgl_assets/colors.css" />
-    <link rel="stylesheet" href="../_static/styles/default.css?7e4102d6ca842c48cb8313d3">
-    <link rel="stylesheet" href="../_static/pygments.css?7e4102d6ca842c48cb8313d3">
+    <link rel="stylesheet" href="../_static/styles/default.css?f7f48a7b25ffcec9284def2b">
+    <link rel="stylesheet" href="../_static/pygments.css?f7f48a7b25ffcec9284def2b">
     
 <style>
   :root {
@@ -27,7 +27,7 @@
         <script src="../_static/language_data.js" defer></script>
       
         <script src="../_static/clipboard.min.js"></script>
-        <script src="../_static/copybutton.js"></script><script src="../_static/scripts/main.js?7e4102d6ca842c48cb8313d3"></script></head>
+        <script src="../_static/copybutton.js"></script><script src="../_static/scripts/main.js?f7f48a7b25ffcec9284def2b"></script></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -134,7 +134,7 @@
 <section id="directly">
 <h2>Directly<a class="headerlink" href="#directly" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install manimgl</span>
-pip install manimgl
+pip<span class="w"> </span>install<span class="w"> </span>manimgl
 
 <span class="c1"># Try it out</span>
 manimgl
@@ -143,12 +143,12 @@ manimgl
 <p>If you want to hack on manimlib itself, clone this repository and in
 that directory execute:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install python requirements</span>
-pip install -e .
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 
 <span class="c1"># Try it out</span>
-manimgl example_scenes.py OpeningManimExample
+manimgl<span class="w"> </span>example_scenes.py<span class="w"> </span>OpeningManimExample
 <span class="c1"># or</span>
-manim-render example_scenes.py OpeningManimExample
+manim-render<span class="w"> </span>example_scenes.py<span class="w"> </span>OpeningManimExample
 </pre></div>
 </div>
 <p>If you run the above command and no error message appears,
@@ -163,10 +163,10 @@ FFmpeg</a>, and make sure that its path is in the PATH environment variable.</p>
 <a class="reference external" href="http://tug.org/texlive/">TeXLive-full</a> is recommended.</p></li>
 <li><p>Install the remaining Python packages.</p></li>
 </ol>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/3b1b/manim.git
-<span class="nb">cd</span> manim
-pip install -e .
-manimgl example_scenes.py OpeningManimExample
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/3b1b/manim.git
+<span class="nb">cd</span><span class="w"> </span>manim
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+manimgl<span class="w"> </span>example_scenes.py<span class="w"> </span>OpeningManimExample
 </pre></div>
 </div>
 </section>
@@ -176,11 +176,11 @@ manimgl example_scenes.py OpeningManimExample
 <li><p>Install FFmpeg and LaTeX as above.</p></li>
 <li><p>Create a conda environment using</p></li>
 </ul>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/3b1b/manim.git
-<span class="nb">cd</span> manim
-conda create -n manim <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8
-conda activate manim
-pip install -e .
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/3b1b/manim.git
+<span class="nb">cd</span><span class="w"> </span>manim
+conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>manim<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8
+conda<span class="w"> </span>activate<span class="w"> </span>manim
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </pre></div>
 </div>
 </section>
