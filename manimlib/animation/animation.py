@@ -195,7 +195,7 @@ class Animation(object):
         return self
 
     def get_run_time(self) -> float:
-        if self.time_span:
+        if self.time_span is not None:
             return max(self.run_time, self.time_span[1])
         return self.run_time
 
