@@ -212,10 +212,10 @@ class Tex(SingleStringTex):
         **kwargs
     ):
         #handle alias
-        if self.tex_to_color_map and hasattr(self,'t2c'):
+        if tex_to_color_map and t2c:
             raise ValueError("You can't set two tex to color map!")
-        if not self.tex_to_color_map and hasattr(self,'t2c'):
-            self.tex_to_color_map=self.t2c
+        if t2c: self.tex_to_color_map = t2c
+        else:   self.tex_to_color_map = tex_to_color_map
             
         self.tex_strings = self.break_up_tex_strings(
             tex_strings,
