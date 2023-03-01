@@ -592,6 +592,8 @@ class Scene(object):
         run_time: float | None = None,
         rate_func: Callable[[float], float] | None = None,
         lag_ratio: float | None = None,
+        recursive: bool | None = None,
+        reorganize: bool | None = False,
     ) -> None:
         if len(proto_animations) == 0:
             log.warning("Called Scene.play with no animations")
@@ -599,8 +601,9 @@ class Scene(object):
         animations = list(map(prepare_animation, proto_animations))
         for anim in animations:
             anim.update_rate_info(run_time, rate_func, lag_ratio)
+            if recursive is not None: anim.recursive = recursive
         self.pre_play()
-        self.begin_animations(animations)
+        self.begin_animations(animations, reorganize = reorganize)
         self.progress_through_animations(animations)
         self.finish_animations(animations)
         self.post_play()
