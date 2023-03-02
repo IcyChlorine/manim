@@ -607,7 +607,10 @@ class Scene(object):
             anim.update_rate_info(run_time, rate_func, lag_ratio)
             if recursive is not None: anim.recursive = recursive
         self.pre_play()
-        self.begin_animations(animations, reorganize = reorganize)
+        try:
+            self.begin_animations(animations, reorganize = reorganize)
+        except TypeError:
+            self.begin_animations(animations)#, reorganize = reorganize)
         self.progress_through_animations(animations)
         self.finish_animations(animations)
         self.post_play()
