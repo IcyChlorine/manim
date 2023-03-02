@@ -405,6 +405,7 @@ class AnnularSector(VMobject):
             fill_color=fill_color,
             fill_opacity=fill_opacity,
             stroke_width=stroke_width,
+            **kwargs,
         )
 
         # Initialize points
@@ -417,11 +418,10 @@ class AnnularSector(VMobject):
             )
             for radius in (inner_radius, outer_radius)
         ]
-        outer_arc.reverse_points()
-        self.append_points(inner_arc.get_points())
+        self.append_points(inner_arc.get_points()[::-1])  # Reverse
         self.add_line_to(outer_arc.get_points()[0])
         self.append_points(outer_arc.get_points())
-        self.add_line_to(inner_arc.get_points()[0])
+        self.add_line_to(inner_arc.get_points()[-1])
 
 
 class Sector(AnnularSector):
@@ -454,6 +454,7 @@ class Annulus(VMobject):
             fill_color=fill_color,
             fill_opacity=fill_opacity,
             stroke_width=stroke_width,
+            **kwargs,
         )
 
         self.radius = outer_radius
@@ -604,6 +605,7 @@ class Line(TipableVMobject):
         if self.path_arc > 0:
             arc_len *= self.path_arc / (2 * math.sin(self.path_arc / 2))
         return arc_len
+
 
 class DashedLine(Line):
     def __init__(

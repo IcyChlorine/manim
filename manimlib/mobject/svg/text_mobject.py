@@ -15,6 +15,8 @@ from manimlib.constants import NORMAL
 from manimlib.logger import log
 from manimlib.mobject.svg.string_mobject import StringMobject
 from manimlib.utils.customization import get_customization
+from manimlib.utils.color import color_to_hex
+from manimlib.utils.color import int_to_hex
 from manimlib.utils.directories import get_downloads_dir
 from manimlib.utils.directories import get_text_dir
 from manimlib.utils.simple_functions import hash_string
@@ -22,21 +24,10 @@ from manimlib.utils.simple_functions import hash_string
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Iterable, Union
+    from typing import Iterable
 
     from manimlib.mobject.types.vectorized_mobject import VGroup
-    from manimlib.typing import ManimColor
-    Span = tuple[int, int]
-    Selector = Union[
-        str,
-        re.Pattern,
-        tuple[Union[int, None], Union[int, None]],
-        Iterable[Union[
-            str,
-            re.Pattern,
-            tuple[Union[int, None], Union[int, None]]
-        ]]
-    ]
+    from manimlib.typing import ManimColor, Span, Selector
 
 
 TEXT_MOB_SCALE_FACTOR = 0.0076
@@ -366,7 +357,7 @@ class MarkupText(StringMobject):
         self, is_labelled: bool
     ) -> tuple[str, str]:
         global_attr_dict = {
-            "foreground": self.color_to_hex(self.base_color),
+            "foreground": color_to_hex(self.base_color),
             "font_family": self.font,
             "font_style": self.slant,
             "font_weight": self.weight,
@@ -394,7 +385,7 @@ class MarkupText(StringMobject):
             self.get_command_string(
                 global_attr_dict,
                 is_end=is_end,
-                label_hex=self.int_to_hex(0) if is_labelled else None
+                label_hex=int_to_hex(0) if is_labelled else None
             )
             for is_end in (False, True)
         )
@@ -425,9 +416,10 @@ class Text(MarkupText):
         text: str,
         # For backward compatibility
         isolate: Selector = (re.compile(r"\w+", re.U), re.compile(r"\S+", re.U)),
+        use_labelled_svg: bool = True,
         **kwargs
     ):
-        super().__init__(text, isolate=isolate, **kwargs)
+        super().__init__(text, isolate=isolate, use_labelled_svg=use_labelled_svg, **kwargs)
 
     @staticmethod
     def get_command_matches(string: str) -> list[re.Match]:

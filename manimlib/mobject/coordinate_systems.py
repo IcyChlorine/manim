@@ -402,6 +402,7 @@ class CoordinateSystem(ABC):
 
 
 class Axes(VGroup, CoordinateSystem):
+    default_axis_config: dict = dict()
     default_x_axis_config: dict = dict()
     default_y_axis_config: dict = dict(line_to_number_direction=LEFT)
 
@@ -412,16 +413,19 @@ class Axes(VGroup, CoordinateSystem):
         axis_config: dict = dict(),
         x_axis_config: dict = dict(),
         y_axis_config: dict = dict(),
-        height: float = FRAME_HEIGHT - 2,
-        width: float = FRAME_WIDTH - 2,
+        height: float | None = None,
+        width: float | None = None,
+        unit_size: float = 1.0,
         **kwargs
     ):
         CoordinateSystem.__init__(self, x_range, y_range, **kwargs)
         VGroup.__init__(self, **kwargs)
 
+        axis_config = dict(**axis_config, unit_size=unit_size)
         self.x_axis = self.create_axis(
             self.x_range,
             axis_config=merge_dicts_recursively(
+                self.default_axis_config,
                 self.default_x_axis_config,
                 axis_config,
                 x_axis_config
@@ -431,11 +435,12 @@ class Axes(VGroup, CoordinateSystem):
         self.y_axis = self.create_axis(
             self.y_range,
             axis_config=merge_dicts_recursively(
+                self.default_axis_config,
                 self.default_y_axis_config,
                 axis_config,
                 y_axis_config
             ),
-            length=height
+            length=height,
         )
         self.y_axis.rotate(90 * DEGREES, about_point=ORIGIN)
         # Add as a separate group in case various other
@@ -449,7 +454,7 @@ class Axes(VGroup, CoordinateSystem):
         self,
         range_terms: RangeSpecifier,
         axis_config: dict,
-        length: float
+        length: float | None
     ) -> NumberLine:
         axis = NumberLine(range_terms, width=length, **axis_config)
         axis.shift(-axis.n2p(0))
@@ -491,6 +496,7 @@ class Axes(VGroup, CoordinateSystem):
 
 class ThreeDAxes(Axes):
     dimension: int = 3
+    default_z_axis_config: dict = dict()
 
     def __init__(
         self,
@@ -510,6 +516,8 @@ class ThreeDAxes(Axes):
         self.z_axis = self.create_axis(
             self.z_range,
             axis_config=merge_dicts_recursively(
+                self.default_axis_config,
+                self.default_z_axis_config,
                 kwargs.get("axes_config", {}),
                 z_axis_config
             ),
@@ -542,9 +550,9 @@ class ThreeDAxes(Axes):
         self.axis_labels = labels
 
     def get_graph(self, func, color=BLUE_E, opacity=0.9, **kwargs):
-        xu = self.x_axis.unit_size
-        yu = self.y_axis.unit_size
-        zu = self.z_axis.unit_size
+        xu = self.x_axis.get_unit_size()
+        yu = self.y_axis.get_unit_size()
+        zu = self.z_axis.get_unit_size()
         x0, y0, z0 = self.get_origin()
         return ParametricSurface(
             lambda u, v: [xu * u + x0, yu * v + y0, zu * func(u, v) + z0],
@@ -557,23 +565,22 @@ class ThreeDAxes(Axes):
 
 
 class NumberPlane(Axes):
+    default_axis_config: dict = dict(
+        stroke_color=WHITE,
+        stroke_width=2,
+        include_ticks=False,
+        include_tip=False,
+        line_to_number_buff=SMALL_BUFF,
+        line_to_number_direction=DL,
+    )
+    default_y_axis_config: dict = dict(
+        line_to_number_direction=DL,
+    )
+
     def __init__(
         self,
         x_range: RangeSpecifier = (-8.0, 8.0, 1.0),
         y_range: RangeSpecifier = (-4.0, 4.0, 1.0),
-        axis_config: dict = dict(
-            stroke_color=WHITE,
-            stroke_width=2,
-            include_ticks=False,
-            include_tip=False,
-            line_to_number_buff=SMALL_BUFF,
-            line_to_number_direction=DL,
-        ),
-        y_axis_config: dict = dict(
-            line_to_number_direction=DL,
-        ),
-        height: float = 8.0,
-        width: float = 16.0,
         background_line_style: dict = dict(
             stroke_color=BLUE_D,
             stroke_width=2,
@@ -585,14 +592,7 @@ class NumberPlane(Axes):
         make_smooth_after_applying_functions: bool = True,
         **kwargs
     ):
-        super().__init__(
-            x_range, y_range,
-            height=height,
-            width=width,
-            axis_config=axis_config,
-            y_axis_config=y_axis_config,
-            **kwargs
-        )
+        super().__init__(x_range, y_range, **kwargs)
         self.background_line_style = dict(background_line_style)
         self.faded_line_style = dict(faded_line_style)
         self.faded_line_ratio = faded_line_ratio
@@ -700,6 +700,7 @@ class ComplexPlane(NumberPlane):
         self,
         numbers: list[complex] | None = None,
         skip_first: bool = True,
+        font_size: int = 36,
         **kwargs
     ):
         if numbers is None:
@@ -715,7 +716,7 @@ class ComplexPlane(NumberPlane):
             else:
                 axis = self.get_x_axis()
                 value = z.real
-            number_mob = axis.get_number_mobject(value, **kwargs)
+            number_mob = axis.get_number_mobject(value, font_size=font_size, **kwargs)
             # For -i, remove the "1"
             if z.imag == -1:
                 number_mob.remove(number_mob[1])

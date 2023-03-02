@@ -114,7 +114,7 @@ class VMobject(Mobject):
             "fill_rgba": np.zeros((1, 4)),
             "stroke_rgba": np.zeros((1, 4)),
             "stroke_width": np.zeros((1, 1)),
-            "unit_normal": np.zeros((1, 3))
+            "unit_normal": np.array(OUT, ndmin=2),
         })
 
     # These are here just to make type checkers happy
@@ -758,10 +758,9 @@ class VMobject(Mobject):
         if not self.has_points():
             return np.zeros(3)
 
-        nppc = self.n_points_per_curve
         points = self.get_points()
-        p0 = points[0::nppc]
-        p1 = points[nppc - 1::nppc]
+        p0 = points[:-1]
+        p1 = points[1:]
 
         # Each term goes through all edges [(x1, y1, z1), (x2, y2, z2)]
         return 0.5 * np.array([
@@ -793,12 +792,6 @@ class VMobject(Mobject):
     def refresh_unit_normal(self):
         for mob in self.get_family():
             mob.get_unit_normal(recompute=True)
-        return self
-
-    def reverse_points(self):
-        super().reverse_points()
-        self.refresh_unit_normal()
-        self.refresh_triangulation()
         return self
 
     # Alignment
@@ -1028,6 +1021,17 @@ class VMobject(Mobject):
     @triggers_refreshed_triangulation
     def set_points(self, points: Vect3Array):
         super().set_points(points)
+        return self
+
+    def append_points(self, points: Vect3Array):
+        super().append_points(points)
+        self.refresh_unit_normal()
+        self.refresh_triangulation()
+        return self
+
+    @triggers_refreshed_triangulation
+    def reverse_points(self):
+        super().reverse_points()
         return self
 
     @triggers_refreshed_triangulation

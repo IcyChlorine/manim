@@ -4,8 +4,7 @@ import numpy as np
 
 from manimlib.constants import DOWN, LEFT, RIGHT, UP
 from manimlib.constants import WHITE
-from manimlib.utils.bezier import interpolate
-from manimlib.mobject.svg.tex_mobject import SingleStringTex
+from manimlib.mobject.svg.tex_mobject import Tex
 from manimlib.mobject.svg.text_mobject import Text
 from manimlib.mobject.types.vectorized_mobject import VMobject
 
@@ -74,7 +73,7 @@ class DecimalNumber(VMobject):
             dots.arrange(RIGHT, buff=2 * dots[0].get_width())
             self.add(dots)
         if self.unit is not None:
-            self.unit_sign = SingleStringTex(self.unit, font_size=self.get_font_size())
+            self.unit_sign = Tex(self.unit, font_size=self.get_font_size())
             self.add(self.unit_sign)
 
         self.arrange(
