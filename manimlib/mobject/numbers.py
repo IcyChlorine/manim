@@ -7,6 +7,7 @@ from manimlib.constants import WHITE
 from manimlib.mobject.svg.tex_mobject import Tex
 from manimlib.mobject.svg.text_mobject import Text
 from manimlib.mobject.types.vectorized_mobject import VMobject
+from manimlib.utils.bezier import interpolate
 
 from typing import TYPE_CHECKING
 
