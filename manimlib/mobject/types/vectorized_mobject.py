@@ -761,13 +761,16 @@ class VMobject(Mobject):
         # IcyChlorine: Fix Anti-aliasing problem for some VMobjects.
         # Anti-aliasing on vector graphic fill boundaries in manim
         # is handled by soft sdf (sigmoid at border) in frag shader.
-        # But it seems its related to unit normals of the object,
-        # which is in turn calculated via area vector of the object,
-        # which is calculated here.
+        # But it's somehow related to unit normals of the object.
+        # If direction of unit normal is wrong (mostly IN miscalculated
+        # as OUT), then AA will fail to work.(TODO: figure out why)
+        # Unit normal is inturn calculated via area vector of the object.
+        #
         # The algorithm was changed at commit d8deec8f(20 Dec 2022 
-        # 10:17) and caused some character to have AA issues randomly.
-        # Revert the algorithm back would solve the problem.
-        # Note: The algorithm was further changed later and this 
+        # 10:17) and caused such errors, which inturn cause
+        # some character to have AA issues randomly.
+        # Reverting the algorithm back have solved the problem here.
+        # But The algorithm was further changed later and this 
         # method may not work there.
         nppc = self.n_points_per_curve
         points = self.get_points()
