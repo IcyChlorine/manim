@@ -758,9 +758,25 @@ class VMobject(Mobject):
         if not self.has_points():
             return np.zeros(3)
 
+        # IcyChlorine: Fix Anti-aliasing problem for some VMobjects.
+        # Anti-aliasing on vector graphic fill boundaries in manim
+        # is handled by soft sdf (sigmoid at border) in frag shader.
+        # But it seems its related to unit normals of the object,
+        # which is in turn calculated via area vector of the object,
+        # which is calculated here.
+        # The algorithm was changed at commit d8deec8f(20 Dec 2022 
+        # 10:17) and caused some character to have AA issues randomly.
+        # Revert the algorithm back would solve the problem.
+        # Note: The algorithm was further changed later and this 
+        # method may not work there.
+        nppc = self.n_points_per_curve
         points = self.get_points()
-        p0 = points[:-1]
-        p1 = points[1:]
+        # Effective Number: Number of Points floored to closest multiple of 3.
+        # Points SHOULD always come in multiple of three, but in some weird
+        # cases (e.g. Writing anim) the rule is broken, it seems.
+        eff_nr = points.shape[0] - points.shape[0] % 3
+        p0 = points[  0   :eff_nr:nppc]
+        p1 = points[nppc-1:eff_nr:nppc]
 
         # Each term goes through all edges [(x1, y1, z1), (x2, y2, z2)]
         return 0.5 * np.array([
