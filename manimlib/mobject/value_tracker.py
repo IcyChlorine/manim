@@ -23,6 +23,9 @@ class ValueTracker(Mobject):
         self.value = value
         super().__init__(**kwargs)
 
+    def __call__(self) -> float | complex:
+        return self.get_value()
+
     def init_data(self) -> None:
         super().init_data()
         self.data["value"] = np.array(
