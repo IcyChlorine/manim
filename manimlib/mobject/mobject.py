@@ -164,6 +164,11 @@ class Mobject(object):
         # Borrowed from https://github.com/ManimCommunity/manim/
         return _AnimationBuilder(self)
 
+    # just a shortcut
+    @property
+    def a(self):
+        return _AnimationBuilder(self)
+
     # Only these methods should directly affect points
 
     def resize_points(
@@ -1002,6 +1007,19 @@ class Mobject(object):
         buff: float = DEFAULT_MOBJECT_TO_EDGE_BUFFER
     ):
         return self.align_on_border(edge, buff)
+
+    def to_quarter(
+        self,
+        corner: Vect3 = LEFT + DOWN,
+    ):
+        return self.move_to(corner * np.array([FRAME_X_RADIUS, FRAME_Y_RADIUS, 0]) / 2)
+
+    def to_side(
+        self, 
+        side: Vect3 = LEFT,
+    ):
+        return self.to_quarter(side)
+
 
     def next_to(
         self,
@@ -2115,6 +2133,10 @@ class _AnimationBuilder:
         self.anim_args = kwargs
         self.can_pass_args = False
         return self
+    
+    # a shortcut
+    def args(self, **kwargs):
+        return self.set_anim_args(**kwargs)
 
     def build(self):
         from manimlib.animation.transform import _MethodAnimation
