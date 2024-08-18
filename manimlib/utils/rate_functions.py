@@ -58,6 +58,8 @@ def there_and_back_with_pause(t: float, pause_ratio: float = 1. / 3) -> float:
 def running_start(t: float, pull_factor: float = -0.5) -> float:
     return bezier([0, 0, pull_factor, pull_factor, 1, 1, 1])(t)
 
+def braking_end(t):
+	return 1-running_start(1-t)
 
 def overshoot(t: float, pull_factor: float = 1.5) -> float:
     return bezier([0, 0, pull_factor, pull_factor, 1, 1])(t)

@@ -229,8 +229,9 @@ class InteractiveScene(Scene):
         self.mobjects.insert(0, self.selection_highlight)
 
     def add(self, *mobjects: Mobject):
-        super().add(*mobjects)
+        ret = super().add(*mobjects)
         self.regenerate_selection_search_set()
+        return ret
 
     def remove(self, *mobjects: Mobject):
         super().remove(*mobjects)

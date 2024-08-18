@@ -1,10 +1,15 @@
 #!/usr/bin/env python
+try:
+    import pretty_errors
+except ModuleNotFoundError:
+    print('Package pretty_errors not found. Printing plain error messages instead.')
+    print('Use `pip install pretty_errors` to get better error messages.')
+	
 from manimlib import __version__
 import manimlib.config
 import manimlib.extract_scene
 import manimlib.logger
 import manimlib.utils.init_config
-
 
 def main():
     print(f"ManimGL \033[32mv{__version__}\033[0m")

@@ -35,7 +35,14 @@ class Animation(object):
         name: str = "",
         # Does this animation add or remove a mobject form the screen
         remover: bool = False,
-        # What to enter into the update function upon completion
+        # When animating mobjects with with subnodes(have family)
+		# Whether interpolate each submobject parallely
+		# (done by animation) or interpolate the mobject recursively.
+		# The latter manner enables father mobject to control how
+		# its submobjects are interpolated.
+		# NOT compatible with all animation types.
+        recursive = False,
+		# What to enter into the update function upon completion
         final_alpha_value: float = 1.0,
         suspend_mobject_updating: bool = True,
     ):
@@ -46,6 +53,7 @@ class Animation(object):
         self.name = name or self.__class__.__name__ + str(self.mobject)
         self.remover = remover
         self.final_alpha_value = final_alpha_value
+        self.recursive = recursive
         self.lag_ratio = lag_ratio
         self.suspend_mobject_updating = suspend_mobject_updating
 
@@ -99,8 +107,16 @@ class Animation(object):
         return self.mobject, self.starting_mobject
 
     def get_all_families_zipped(self) -> zip[tuple[Mobject]]:
+        # IcyChlorine: This is not the most semantically correct
+		# place to implement self.recursive (as the returned value
+		# will become self.families, but then we will not have 
+		# 'self.families' being the entire families), but the most
+		# suitable function to implement. Minimized code modification
+		# is needed by modifying this function. 
+		# Maybe 'self.families' should be better called
+		# 'self.all_submobjs' instead.
         return zip(*[
-            mob.get_family()
+            mob.get_family(not self.recursive)
             for mob in self.get_all_mobjects()
         ])
 
@@ -185,7 +201,7 @@ class Animation(object):
         return self
 
     def get_run_time(self) -> float:
-        if self.time_span:
+        if self.time_span is not None:
             return max(self.run_time, self.time_span[1])
         return self.run_time
 

@@ -208,6 +208,11 @@ def get_manim_dir():
 def get_module(file_name: str | None) -> Module:
     if file_name is None:
         return None
+
+    # TODO: Fix potential import issues if they exists.
+    # after some efforts, they seems to disappear automatically,
+    # without changing any actual codes. 
+    # See: https://github.com/3b1b/manim/issues/1132
     module_name = file_name.replace(os.sep, ".").replace(".py", "")
     spec = importlib.util.spec_from_file_location(module_name, file_name)
     module = importlib.util.module_from_spec(spec)

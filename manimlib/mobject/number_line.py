@@ -94,7 +94,7 @@ class NumberLine(Line):
             x_max = self.x_max
         else:
             x_max = self.x_max + self.x_step
-        return np.arange(self.x_min, x_max, self.x_step)
+        return np.arange(self.x_min+self.tick_offset, x_max, self.x_step)
 
     def add_ticks(self) -> None:
         ticks = VGroup()

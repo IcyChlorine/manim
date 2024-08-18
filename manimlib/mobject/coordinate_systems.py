@@ -79,6 +79,9 @@ class CoordinateSystem(ABC):
     def get_origin(self) -> Vect3:
         return self.c2p(*[0] * self.dimension)
 
+    # the return type is intentionally set here
+	# so pylance won't take Exception and 
+	# recgnize subsequent code as "unreachable".
     @abstractmethod
     def get_axes(self) -> VGroup:
         raise Exception("Not implemented")

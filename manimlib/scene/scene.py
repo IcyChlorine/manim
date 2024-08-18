@@ -17,6 +17,7 @@ import numpy as np
 from tqdm.auto import tqdm as ProgressDisplay
 
 from manimlib.animation.animation import prepare_animation
+from manimlib.animation.animation import Animation
 from manimlib.animation.fading import VFadeInThenOut
 from manimlib.camera.camera import Camera
 from manimlib.camera.camera_frame import CameraFrame
@@ -408,7 +409,7 @@ class Scene(object):
         return wrapper
 
     @affects_mobject_list
-    def add(self, *new_mobjects: Mobject):
+    def add(self, *new_mobjects: Mobject) -> Mobject | Iterable[Mobject]:
         """
         Mobjects will be displayed, from background to
         foreground in the order with which they are added.
@@ -420,7 +421,11 @@ class Scene(object):
             for m in new_mobjects
             for sm in m.get_family()
         })
-        return self
+
+        # Return the mobjects being added.
+        # so handy that I add it here. (starsky)
+        if len(new_mobjects)==1: return new_mobjects[0]
+        else: return new_mobjects
 
     def add_mobjects_among(self, values: Iterable):
         """
@@ -472,6 +477,11 @@ class Scene(object):
     @affects_mobject_list
     def clear(self):
         self.mobjects = []
+        return self
+
+    def pop(self):
+        if len(self.mobjects)>0: 
+            self.remove(self.mobjects[-1])
         return self
 
     def get_mobjects(self) -> list[Mobject]:
@@ -650,6 +660,8 @@ class Scene(object):
         run_time: float | None = None,
         rate_func: Callable[[float], float] | None = None,
         lag_ratio: float | None = None,
+        recursive: bool | None = None,
+        reorganize: bool | None = False,
     ) -> None:
         if len(proto_animations) == 0:
             log.warning("Called Scene.play with no animations")
@@ -657,8 +669,12 @@ class Scene(object):
         animations = list(map(prepare_animation, proto_animations))
         for anim in animations:
             anim.update_rate_info(run_time, rate_func, lag_ratio)
+            if recursive is not None: anim.recursive = recursive
         self.pre_play()
-        self.begin_animations(animations)
+        try:
+            self.begin_animations(animations, reorganize = reorganize)
+        except TypeError:
+            self.begin_animations(animations)#, reorganize = reorganize)
         self.progress_through_animations(animations)
         self.finish_animations(animations)
         self.post_play()

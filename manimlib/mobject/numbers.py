@@ -7,6 +7,7 @@ from manimlib.constants import WHITE
 from manimlib.mobject.svg.tex_mobject import Tex
 from manimlib.mobject.svg.text_mobject import Text
 from manimlib.mobject.types.vectorized_mobject import VMobject
+from manimlib.utils.bezier import interpolate
 
 from typing import TYPE_CHECKING
 
@@ -182,6 +183,14 @@ class DecimalNumber(VMobject):
         self.set_value(self.get_value() + delta_t)
         return self
 
+    def interpolate(self, m1: VMobject, m2: VMobject, alpha: float, *args, **kwargs):
+        if isinstance(m1, DecimalNumber) and isinstance(m2, DecimalNumber):
+            super().interpolate(m1, m2, alpha, *args, **kwargs)
+            self.set_value(interpolate(m1.get_value(),m2.get_value(),alpha))
+            # self.move_to(interpolate(m1.get_center(),m2.get_center(),alpha))
+            return self
+        else:
+            return super().interpolate(m1, m2, alpha, *args, **kwargs)
 
 class Integer(DecimalNumber):
     def __init__(

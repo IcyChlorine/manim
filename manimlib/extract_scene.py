@@ -6,13 +6,19 @@ from manimlib.config import get_custom_config
 from manimlib.logger import log
 from manimlib.scene.interactive_scene import InteractiveScene
 from manimlib.scene.scene import Scene
-
+from manimlib.mobject.geometry import Circle, Rectangle
 
 class BlankScene(InteractiveScene):
     def construct(self):
         exec(get_custom_config()["universal_import_line"])
         self.embed()
 
+class DefaultPlayground(Scene):
+    def construct(self):
+        r,c=self.add(Rectangle(),Circle())
+        exec(get_custom_config()["universal_import_line"])  
+        print('Available locals: r-Rectangle, c-Circle.')
+        self.embed()
 
 def is_child_scene(obj, module):
     if not inspect.isclass(obj):
@@ -128,7 +134,11 @@ def main(config):
     scene_config = get_scene_config(config)
     if module is None:
         # If no module was passed in, just play the blank scene
-        return [BlankScene(**scene_config)]
+        #return [BlankScene(**scene_config)]
+
+        # Usually I use the undecorated `manimgl` cmd for debugging.
+        # So it's better to have sth to manipulate with than an empty scene. -lcj
+        return [DefaultPlayground(**scene_config)]
 
     all_scene_classes = get_scene_classes_from_module(module)
     scenes = get_scenes_to_render(all_scene_classes, scene_config, config)
